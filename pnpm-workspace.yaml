@@ -1,0 +1,3 @@
+# Required native dependency; other dependency scripts remain unapproved.
+allowBuilds:
+  onnxruntime-node: true

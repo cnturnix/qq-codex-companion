@@ -1,0 +1,20 @@
+{
+  "name": "qq-codex-bot",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": ">=24.5"
+  },
+  "scripts": {
+    "start": "node src/napcat-main.mjs",
+    "start:official": "node src/main.mjs",
+    "check": "node src/check-companion.mjs",
+    "check:official": "node src/check.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "onnxruntime-node": "1.30.0",
+    "sharp": "0.35.5"
+  }
+}

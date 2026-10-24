@@ -1,0 +1,45 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+!.env.official.example
+.codex/
+.agents/
+.aws/
+.ssh/
+**/console-token
+**/console-url.txt
+*.pem
+*.key
+
+# Local records, media, models and development artifacts
+runtime/
+work/
+tools/
+records/
+botRecord/
+logs/
+backups/
+*.log
+*.jsonl
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.onnx
+
+# Installed dependencies and third-party applications
+node_modules/
+NapCat*/
+bootmain/
+*.zip
+*.exe
+*.dll
+
+# Editor / OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
