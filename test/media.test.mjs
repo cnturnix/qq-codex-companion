@@ -61,6 +61,7 @@ test('private stickers use immediate vision and separate sends, ordinary picture
   const chat = f.calls.find(c => c.prompt.direct); assert.ok(chat); assert.equal(chat.options.imagePaths.length, 1);
   assert.deepEqual(f.sent.map(s => s.type), ['text', 'image']);
   assert.ok(f.sent.every(s => s.args[0] === 'private' && s.args[1] === '33333'));
+  assert.equal(f.sent[0].args[3], undefined);
 });
 test('first import tags once; duplicate bytes, renames and metadata changes reuse local recognition', async t => {
   const f = fixture(t), bytes = await pic();

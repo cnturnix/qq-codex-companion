@@ -77,7 +77,7 @@ export class OneBotClient extends EventEmitter {
   async send(kind, id, text, replyId, mentions = []) {
     if (!Array.isArray(mentions) || mentions.length > 3 || mentions.some(qq => typeof qq !== 'string' || !/^\d{5,20}$/.test(qq)) || (kind !== 'group' && mentions.length)) throw Error('提及对象必须为本群已确认的 QQ 号。');
     const message = [];
-    if (replyId) message.push({ type: 'reply', data: { id: String(replyId) } });
+    if (kind === 'group' && replyId) message.push({ type: 'reply', data: { id: String(replyId) } });
     for (const qq of new Set(mentions)) message.push({ type: 'at', data: { qq } }, { type: 'text', data: { text: ' ' } });
     message.push({ type: 'text', data: { text } });
     return this.call(kind === 'group' ? 'send_group_msg' : 'send_private_msg', { [kind === 'group' ? 'group_id' : 'user_id']: id, message });

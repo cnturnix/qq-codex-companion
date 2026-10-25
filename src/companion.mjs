@@ -436,6 +436,7 @@ export class Companion {
   async send(room, text, replyId, isCurrent = () => true, mentions = []) {
     if (!this.allowed(room.kind, room.id)) throw new Error('当前会话未获准。');
     if (!isCurrent()) throw new Error('任务已停止。');
+    if (room.kind === 'private') replyId = undefined;
     let result;
     try { result = await this.qq.send(room.kind, room.id, text, replyId, mentions); }
     catch (error) {

@@ -62,10 +62,13 @@ test('private allowlist changes create manageable rooms and direct replies bypas
   room.lastReplyAt = f.now(); room.socialReplyTimes = [f.now()];
   await f.bot.accept(msg('direct', '你好', { privateChat: true, at: false })); await flush(f.bot);
   assert.equal(f.sends.length, 1); assert.equal(f.sends[0][0], 'private'); assert.equal(f.sends[0][1], '33333'); assert.equal(f.asks[0].direct, true);
+  assert.equal(f.sends[0][3], undefined);
   assert.equal(f.calls.length, 0); assert.equal(room.nextCheckAt, 0);
+  await f.bot.accept(msg('private-command', '/状态', { privateChat: true, at: false }));
+  assert.equal(f.sends.length, 2); assert.match(f.sends[1][2], /Codex 状态/); assert.equal(f.sends[1][3], undefined);
   const enabled = f.settings.value; f.settings.update({ allowedUsers: [] }); await f.bot.settingsChanged(enabled);
   await f.bot.accept(msg('blocked-again', '不要保存我', { privateChat: true, at: false })); await flush(f.bot);
-  assert.equal(f.sends.length, 1); assert.ok(!room.history.some(m => m.id === 'blocked-again'));
+  assert.equal(f.sends.length, 2); assert.ok(!room.history.some(m => m.id === 'blocked-again'));
 });
 
 test('private text uses at most 30 recent records, respects silent mode and has an appropriate failure reply', async t => {
@@ -76,6 +79,7 @@ test('private text uses at most 30 recent records, respects silent mode and has 
   f.codex.ask = async () => { throw Error('模型生成失败'); };
   await f.bot.accept(msg('failed', '在吗', { privateChat: true, at: false })); await flush(f.bot);
   assert.match(f.sends.at(-1)[2], /收到你的消息/); assert.ok(!f.sends.at(-1)[2].includes('@'));
+  assert.ok(f.sends.every(s => s[3] === undefined));
   f.settings.update({ mode: 'silent' });
   await f.bot.accept(msg('silent', '在吗', { privateChat: true, at: false })); await flush(f.bot);
   assert.equal(f.sends.length, 2);
@@ -437,5 +441,9 @@ test('OneBot correlates concurrent calls, rejects API failures, and sends segmen
   assert.equal(client.identity.id, '99999');
   await Promise.all([client.send('group', '11111', '[CQ:at,qq=all] hello', '123'), client.call('get_group_list')]);
   const sent = Socket.sent.find(s => s.action === 'send_group_msg'); assert.equal(sent.params.message[1].type, 'text'); assert.equal(sent.params.message[1].data.text, '[CQ:at,qq=all] hello');
+  assert.deepEqual(sent.params.message[0], { type: 'reply', data: { id: '123' } });
+  await client.send('private', '33333', '你好呀', 'private-original');
+  const privateSent = Socket.sent.find(s => s.action === 'send_private_msg');
+  assert.deepEqual(privateSent.params, { user_id: '33333', message: [{ type: 'text', data: { text: '你好呀' } }] });
   await assert.rejects(client.call('bad'), error => error.code === 'QQ_API_REJECTED' && error.action === 'bad' && error.retcode === 100); assert.equal(client.pending.size, 0);
 });
